@@ -15,7 +15,7 @@ target_include_directories(${timer_name}
 
 file(GLOB_RECURSE source_files_master ${CMAKE_HOME_DIRECTORY}/src/master/*.c)
 add_executable(${master_name} ${source_files_master})
-target_include_directories(${timer_name}
+target_include_directories(${master_name}
                            PUBLIC ${CMAKE_HOME_DIRECTORY}/include/master)
 
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
