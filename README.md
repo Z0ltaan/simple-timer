@@ -5,9 +5,9 @@ Consists of timer binary and master timer binary.
 
 # Dependencies
 
-git
-cmake 3.22 or higher
-gcc or different c compiler
+- git
+- cmake 3.22 or higher
+- gcc or different c compiler
 
 <!-- TODO: write down other deps -->
 
@@ -16,4 +16,3 @@ gcc or different c compiler
 ```bash
 
 ```
-
