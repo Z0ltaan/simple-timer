@@ -96,6 +96,7 @@ int main_logic(int argc, char **argv) {
 
   {
     GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_widget_set_valign(main_box, GTK_ALIGN_CENTER);
 
     TimerButtonData dt = {&stopped, &previous_timestamp};
     GtkWidget *timestamp_layout = timer__create_timestamp_layout(NULL);

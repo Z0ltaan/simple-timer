@@ -42,6 +42,7 @@ GtkWidget *timer__create_buttons_layout(void *data) {
                    G_CALLBACK(timer__add_minute_button_clicked),
                    dt->previous_timestamp);
 
+  gtk_widget_set_halign(button_box, GTK_ALIGN_CENTER);
   gtk_box_append(GTK_BOX(button_box), stop_button);
   gtk_box_append(GTK_BOX(button_box), add_minute_button);
 
