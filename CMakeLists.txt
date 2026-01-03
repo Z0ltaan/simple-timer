@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(
   simple-timer
-  VERSION 0.2.0
+  VERSION 0.3.0
   LANGUAGES C)
 
 set(timer_name "${PROJECT_NAME}")
