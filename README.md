@@ -14,5 +14,5 @@ Consists of timer binary and master timer binary.
 # Build
 
 ```bash
-
+cmake -B build && cmake --build build -j9
 ```
