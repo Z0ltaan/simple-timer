@@ -3,30 +3,69 @@
 #include "constants.h"
 #include "gui/layouts.h"
 #include "miniaudio/miniaudio.h"
+#include "options.h"
 #include "timestamp_interaction.h"
-#include <bits/types/struct_timespec.h>
+#include <getopt.h>
 #include <glib.h>
-#include <glibconfig.h>
 #include <gtk/gtk.h>
 #include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
-#include <unistd.h>
 
 int main_logic(int argc, char **argv) {
-  time_t previous_timestamp = 7;
-  time_t interval = 100;
-  bool stopped = false;
-  bool should_close = false;
+  time_t previous_timestamp = 0;
+  char sound_path[256];
 
+  time_t interval = 100;
+
+  // NOTE: handle cl args
+  const char *short_options = "hs:t:";
+  const struct option long_options[] = {
+      {"help", no_argument, RETURN_VAL, VAL_SHORT_HELP_OPT},
+      {"sound-path", required_argument, RETURN_VAL, VAL_SHORT_PATH_OPT},
+      {"time", required_argument, RETURN_VAL, VAL_SHORT_TIME_OPT},
+      {NULL, 0, NULL, 0}};
+
+  bool time_is_set = false;
+  bool sound_is_set = false;
+
+  char rez = 0;
+  while ((rez = getopt_long(argc, argv, short_options, long_options, NULL)) !=
+         -1) {
+    switch (rez) {
+    case VAL_SHORT_HELP_OPT:
+      timer__print_help();
+      exit(0);
+      break;
+    case VAL_SHORT_PATH_OPT:
+      timer__set_sound_file_path(sound_path, optarg, strlen(optarg));
+      sound_is_set = true;
+      break;
+    case VAL_SHORT_TIME_OPT:
+      timer__set_time(&previous_timestamp, optarg);
+      time_is_set = true;
+      break;
+    case '?':
+      exit(-1);
+    default:
+      break;
+    }
+  }
+
+  if (!(time_is_set && sound_is_set)) {
+    perror("Usage: simple-timer <time-opt> <sound-path-opt>\n");
+    return -1;
+  }
+
+  // NOTE: init miniaudio
   ma_result result;
   ma_decoder decoder;
   ma_device_config deviceConfig;
   ma_device device;
 
-  result = ma_decoder_init_file("./build/pickupCoin.wav", NULL, &decoder);
-  if (result != MA_SUCCESS) {
+  if (ma_decoder_init_file(sound_path, NULL, &decoder) != MA_SUCCESS) {
+    printf("Could not initialize sound file w path: %s", sound_path);
     return -2;
   }
 
@@ -46,6 +85,10 @@ int main_logic(int argc, char **argv) {
     return -3;
   }
 
+  bool stopped = false;
+  bool should_close = false;
+
+  // NOTE: init gtk
   gtk_init();
   GtkWidget *window = gtk_window_new();
   GtkWidget *timestamp_label;
@@ -72,6 +115,7 @@ int main_logic(int argc, char **argv) {
   size_t inner_ticks = 0;
   bool start_beeping = false;
 
+  // NOTE: main loop
   while (g_list_model_get_n_items(gtk_window_get_toplevels()) > 0) {
     g_main_context_iteration(NULL, false);
 
@@ -109,23 +153,3 @@ int main_logic(int argc, char **argv) {
 
   return 0;
 }
-// int main(int argc, char **argv) {
-//   char program_path[256];
-//   memcpy(program_path, argv[0], (strrchr(argv[0], '/') - argv[0]));
-//   printf("%s\n", program_path);
-//   ma_result result;
-//   ma_engine engine;
-//   result = ma_engine_init(NULL, &engine);
-//   if (result != MA_SUCCESS) {
-//     return -1;
-//   }
-//   for (int i = 0; i < 10; ++i) {
-//     if (ma_engine_play_sound(&engine, "./build/synth.wav", NULL) !=
-//         MA_SUCCESS) {
-//       printf("shit\n");
-//     }
-//   }
-//   getchar();
-//   ma_engine_uninit(&engine);
-//   return 0;
-// }
